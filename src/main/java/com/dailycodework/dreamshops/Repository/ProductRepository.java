@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
 
-    List<Product> findProductByCategory(String  nameCategory);
+    List<Product> findProductByCategory_Name(String  category);
     List<Product>findProductByBrand(String brand);
     List<Product>findProductByName(String name);
-    List<Product>findProductByCategoryAndBrand(String nameCategory,String brand);
-    List<Product>findProductByNameAndCategory(String name,String nameCategory);
+    List<Product>findProductByCategory_NameAndBrand(String category,String brand);
+    List<Product>findProductByBrandAndName(String brand,String name);
     Long countProductByNameAndBrand(String name,String brand);
 
 }

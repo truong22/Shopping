@@ -5,11 +5,14 @@ import com.dailycodework.dreamshops.Repository.CategoryRepository;
 import com.dailycodework.dreamshops.Repository.ProductRepository;
 import com.dailycodework.dreamshops.Request.AddProductRequest;
 import com.dailycodework.dreamshops.Request.UpdateProductRequest;
+import com.dailycodework.dreamshops.dto.ProductDto;
+import com.dailycodework.dreamshops.Config.Shopconfig;
 import com.dailycodework.dreamshops.entity.Category;
 import com.dailycodework.dreamshops.entity.Product;
 import com.dailycodework.dreamshops.service.Category.ICategoryService;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,7 @@ import java.util.Optional;
 public class ProductService  implements IproductService {
     private final ProductRepository productRepository;
     private  final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
     @Override
     public Product addProduct(AddProductRequest request) {
         Category category = Optional.ofNullable(categoryRepository.findCategoryByName(request.getCategory().getName()))
@@ -77,7 +81,7 @@ public class ProductService  implements IproductService {
 
     @Override
     public List<Product> getProductByCategory(String nameCategory) {
-        return productRepository.findProductByCategory(nameCategory);
+        return productRepository.findProductByCategory_Name(nameCategory);
     }
 
     @Override
@@ -91,17 +95,28 @@ public class ProductService  implements IproductService {
     }
 
     @Override
-    public List<Product> getProductByCategoryAndBrand(String nameCategory, String brand) {
-        return productRepository.findProductByCategoryAndBrand(nameCategory,brand);
+    public List<Product> getProductByCategoryAndBrand(String category, String brand) {
+        return productRepository.findProductByCategory_NameAndBrand(category,brand);
     }
 
     @Override
-    public List<Product> getProductByNameAndCategory(String name, String nameCategory) {
-        return productRepository.findProductByNameAndCategory(name,nameCategory);
+    public List<Product> getProductByNameAndBrand(String name, String brand) {
+        return productRepository.findProductByBrandAndName(name,brand);
     }
 
     @Override
     public Long countProductByBrandAndName(String name, String brand) {
         return productRepository.countProductByNameAndBrand(name,brand);
     }
+
+    @Override
+    public List<ProductDto> getconvertedProduct(List<Product> products) {
+        return products.stream().map(this::ConverToDto).toList();
+    }
+
+    public ProductDto ConverToDto(Product product){
+        ProductDto productDto=modelMapper.map(product,ProductDto.class);
+        return productDto;
+    }
+
 }
