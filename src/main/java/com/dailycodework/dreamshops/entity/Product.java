@@ -28,4 +28,15 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    public Product(String name, String brand,BigDecimal price,  int inventory, String desciption, Category category) {
+        this.name = name;
+        this.brand = brand;
+       this.Desciption = desciption;
+        this.inventory = inventory;
+        this.price = price;
+        this.category = category;
+    }
+
+
 }

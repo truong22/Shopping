@@ -1,4 +1,107 @@
 package com.dailycodework.dreamshops.service.Product;
 
-public class ProductService {
+import com.dailycodework.dreamshops.Exception.ResourcetNotFoundException;
+import com.dailycodework.dreamshops.Repository.CategoryRepository;
+import com.dailycodework.dreamshops.Repository.ProductRepository;
+import com.dailycodework.dreamshops.Request.AddProductRequest;
+import com.dailycodework.dreamshops.Request.UpdateProductRequest;
+import com.dailycodework.dreamshops.entity.Category;
+import com.dailycodework.dreamshops.entity.Product;
+import com.dailycodework.dreamshops.service.Category.ICategoryService;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class ProductService  implements IproductService {
+    private final ProductRepository productRepository;
+    private  final CategoryRepository categoryRepository;
+    @Override
+    public Product addProduct(AddProductRequest request) {
+        Category category = Optional.ofNullable(categoryRepository.findCategoryByName(request.getCategory().getName()))
+                .orElseGet(()->{
+                    Category newCategory= new Category(request.getCategory().getName());
+                    return categoryRepository.save(newCategory);
+                });
+        request.setCategory(category);
+        return productRepository.save(createProduct(request,category));
+    }
+
+    private Product createProduct(AddProductRequest request, Category category){
+        return new Product(
+                request.getName(),
+                request.getBrand(),
+                request.getPrice(),
+                request.getInventory(),
+                request.getDescription(),
+                category);
+    }
+
+    @Override
+    public Product updateProduct(UpdateProductRequest request, Long id) {
+        return productRepository.findById(id).map(existingProduct->updateExistingProduct(request,existingProduct))
+                .map(productRepository::save).orElseThrow( ()->new ResourcetNotFoundException("not id found"));
+    }
+    private Product updateExistingProduct(UpdateProductRequest request,Product existingProduct){
+        existingProduct.setName(request.getName());
+        existingProduct.setBrand(request.getBrand());
+        existingProduct.setPrice(request.getPrice());
+        existingProduct.setInventory(request.getInventory());
+        existingProduct.setDesciption(request.getDescription());
+        Category category = categoryRepository.findCategoryByName(request.getCategory().getName());
+        existingProduct.setCategory(category);
+        return existingProduct;
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
+        productRepository.findById(id).ifPresentOrElse(productRepository ::delete,
+                ()->{ throw new ResourcetNotFoundException("not id found");});
+
+    }
+
+    @Override
+    public Product getByProductById(Long id) {
+        return productRepository.findById(id).orElseThrow(()->new ResourcetNotFoundException("not id found"));
+    }
+
+    @Override
+    public List<Product> getProductAll() {
+        return productRepository.findAll();
+    }
+
+    @Override
+    public List<Product> getProductByCategory(String nameCategory) {
+        return productRepository.findProductByCategory(nameCategory);
+    }
+
+    @Override
+    public List<Product> getProductByBrand(String brand) {
+        return productRepository.findProductByBrand(brand);
+    }
+
+    @Override
+    public List<Product> getProductByName(String name) {
+        return productRepository.findProductByName(name);
+    }
+
+    @Override
+    public List<Product> getProductByCategoryAndBrand(String nameCategory, String brand) {
+        return productRepository.findProductByCategoryAndBrand(nameCategory,brand);
+    }
+
+    @Override
+    public List<Product> getProductByNameAndCategory(String name, String nameCategory) {
+        return productRepository.findProductByNameAndCategory(name,nameCategory);
+    }
+
+    @Override
+    public Long countProductByBrandAndName(String name, String brand) {
+        return productRepository.countProductByNameAndBrand(name,brand);
+    }
 }
