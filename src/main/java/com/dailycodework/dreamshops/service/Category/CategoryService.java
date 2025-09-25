@@ -1,10 +1,9 @@
-package com.dailycodework.dreamshops.service;
+package com.dailycodework.dreamshops.service.Category;
 
 import com.dailycodework.dreamshops.Exception.AlreadyExistsException;
 import com.dailycodework.dreamshops.Exception.ResourcetNotFoundException;
 import com.dailycodework.dreamshops.Repository.CategoryRepository;
 import com.dailycodework.dreamshops.entity.Category;
-import jakarta.persistence.Id;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

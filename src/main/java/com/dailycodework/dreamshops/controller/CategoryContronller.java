@@ -4,8 +4,7 @@ import com.dailycodework.dreamshops.Exception.AlreadyExistsException;
 import com.dailycodework.dreamshops.Exception.ResourcetNotFoundException;
 import com.dailycodework.dreamshops.entity.Category;
 import com.dailycodework.dreamshops.reponse.ApiReponse;
-import com.dailycodework.dreamshops.service.ICategoryService;
-import lombok.Getter;
+import com.dailycodework.dreamshops.service.Category.ICategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 
