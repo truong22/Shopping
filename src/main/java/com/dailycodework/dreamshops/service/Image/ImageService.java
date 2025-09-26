@@ -51,26 +51,27 @@ public class ImageService implements IimageService{
         List<ImageDto> saveImageDto=new ArrayList<>();
         for(MultipartFile file:files){
             try{
-            Image image =new Image();
-            image.setFileName(file.getOriginalFilename());
-            image.setFileType(file.getContentType());
-            image.setImage(new SerialBlob(file.getBytes()));
-            image.setProduct(product);
+                Image images = new Image();
+                images.setFileName(file.getOriginalFilename());
+                images.setFileType(file.getContentType());
+                images.setImage(new SerialBlob(file.getBytes()));
+                images.setProduct(product);
+                Image savedImage = imageRepository.save(images);
 
-            String buildDownloadUrl="api/v1/images/image/download/";
-            String downloadUrl=buildDownloadUrl+image.getId();
-            image.setDowmloadUrl(downloadUrl);
-            Image saveImage=imageRepository.save(image);
-            saveImage.setDowmloadUrl(buildDownloadUrl+saveImage.getId());
-            imageRepository.save(saveImage);
+                // Tạo downloadUrl bằng id đã sinh
+                String buildDownloadUrl = "/api/v1/images/image/download/";
+                String downloadUrl = buildDownloadUrl + savedImage.getId();
 
-            ImageDto imageDto=new ImageDto();
-            imageDto.setId(saveImage.getId());
-            imageDto.setFileName(saveImage.getFileName());
-            imageDto.setDownloadUrl(saveImage.getDowmloadUrl());
-            saveImageDto.add(imageDto);
-        }catch (IOException|SQLException e){
-                throw  new RuntimeException(e.getMessage());
+                savedImage.setDowmloadUrl(downloadUrl);
+                imageRepository.save(savedImage);
+
+                ImageDto imageDto =new ImageDto();
+                imageDto.setFileName(file.getOriginalFilename());
+                imageDto.setId(savedImage.getId());
+                imageDto.setDownloadUrl(savedImage.getDowmloadUrl());
+                saveImageDto.add(imageDto);
+            } catch (IOException | SQLException e) {
+                throw new RuntimeException(e.getMessage());
             }
     }return saveImageDto;
     }

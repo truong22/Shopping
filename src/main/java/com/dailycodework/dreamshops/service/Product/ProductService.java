@@ -2,14 +2,18 @@ package com.dailycodework.dreamshops.service.Product;
 
 import com.dailycodework.dreamshops.Exception.ResourcetNotFoundException;
 import com.dailycodework.dreamshops.Repository.CategoryRepository;
+import com.dailycodework.dreamshops.Repository.ImageRepository;
 import com.dailycodework.dreamshops.Repository.ProductRepository;
 import com.dailycodework.dreamshops.Request.AddProductRequest;
 import com.dailycodework.dreamshops.Request.UpdateProductRequest;
+import com.dailycodework.dreamshops.dto.ImageDto;
 import com.dailycodework.dreamshops.dto.ProductDto;
 import com.dailycodework.dreamshops.Config.Shopconfig;
 import com.dailycodework.dreamshops.entity.Category;
+import com.dailycodework.dreamshops.entity.Image;
 import com.dailycodework.dreamshops.entity.Product;
 import com.dailycodework.dreamshops.service.Category.ICategoryService;
+import com.dailycodework.dreamshops.service.Image.ImageService;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -25,6 +29,7 @@ public class ProductService  implements IproductService {
     private final ProductRepository productRepository;
     private  final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+    private  final ImageRepository imageRepository;
     @Override
     public Product addProduct(AddProductRequest request) {
         Category category = Optional.ofNullable(categoryRepository.findCategoryByName(request.getCategory().getName()))
@@ -116,6 +121,15 @@ public class ProductService  implements IproductService {
 
     public ProductDto ConverToDto(Product product){
         ProductDto productDto=modelMapper.map(product,ProductDto.class);
+        List<Image>images=imageRepository.findByProductId(product.getId());
+        List<ImageDto> imageDtos=images.stream()
+                .map(image -> {
+                    ImageDto dto = modelMapper.map(image, ImageDto.class);
+                    dto.setDownloadUrl("/api/v1/images/image/download/" + image.getId());
+                    return dto;
+                })
+                .toList();
+        productDto.setImages(imageDtos);
         return productDto;
     }
 
